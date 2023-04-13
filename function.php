@@ -1,63 +1,58 @@
-////Функуия переработки массива в правильное расположение для дерева
+////Р¤СѓРЅРєСѓРёСЏ РїРµСЂРµСЂР°Р±РѕС‚РєРё РјР°СЃСЃРёРІР° РІ РїСЂР°РІРёР»СЊРЅРѕРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РґР»СЏ РґРµСЂРµРІР°
+<?php 
 function convert($array, $i = 'telecom_id', $p = 'master_id')
-        {
-            if (!is_array($array)) {
-                return array();
-            } else {
-                $ids = array();
-                foreach ($array as $k => $v) {
-                    if (is_array($v)) {
-                        if ((isset($v[$i]) || ($i === false)) && isset($v[$p])) {
-                            $key = ($i === false) ? $k : $v[$i];
-                            $parent = $v[$p];
-                            $ids[$parent][$key] = $v;
-                        }
-                    }
-                }
-                return (isset($ids[0])) ? convert_node($ids, 0, 'children') : false;
-            }
-        }
+{
+if (!is_array($array)) {
+return array();
+} else {
+$ids = array();
+foreach ($array as $k => $v) {
+if (is_array($v)) {
+if ((isset($v[$i]) || ($i === false)) && isset($v[$p])) {
+$key = ($i === false) ? $k : $v[$i];
+$parent = $v[$p];
+$ids[$parent][$key] = $v;
+}
+}
+}
+return (isset($ids[0])) ? convert_node($ids, 0, 'children') : false;
+}
+}
 
-        function convert_node($index, $root, $cn)
-        {
-            $_ret = array();
-            foreach ($index[$root] as $k => $v) {
-                $_ret[$k] = $v;
-                if (isset($index[$k])) {
-                    $_ret[$k][$cn] = convert_node($index, $k, $cn);
-                }
-            }
-            return $_ret;
-        }
+function convert_node($index, $root, $cn)
+{
+$_ret = array();
+foreach ($index[$root] as $k => $v) {
+$_ret[$k] = $v;
+if (isset($index[$k])) {
+$_ret[$k][$cn] = convert_node($index, $k, $cn);
+}
+}
+return $_ret;
+}
 
-        $user = User::getById($_SESSION['id']);
-        $emp_telecom_list = EmpTelecom::query()
-            ->where('emp_id', $user->id)
-            ->get();
+$emp_telecom_list[0]->telecom_id;
+$data1 = json_decode(json_encode($emp_telecom_list[0]->telecom_id), true);
 
-        if ($emp_telecom_list[0]->telecom_id != '') {
-            $emp_telecom_list[0]->telecom_id;
-            $data1 = json_decode(json_encode($emp_telecom_list[0]->telecom_id), true);
-            $data = TelecomTree::whereRaw("telecom_id IN($data1)")->get();
+foreach ($data as $key1 => $value1) {
+$master_id = $value1->master_id;
+$k = false;
+foreach ($data as $key => $value) {
+if ($master_id == $value->telecom_id) {
+$k = true;
+}
+}
+if ($k == false && $value1->master_id != 0) {
+$data[$key1]['master_id'] = 2;
+}
+}
 
-            foreach ($data as $key1 => $value1) {
-                $master_id = $value1->master_id;
-                $k = false;
-                foreach ($data as $key => $value) {
-                    if ($master_id == $value->telecom_id) {
-                        $k = true;
-                    }
-                }
-                if ($k == false && $value1->master_id != 0) {
-                    $data[$key1]['master_id'] = 2;
-                }
-            }
+$data = json_decode(json_encode($data), true);
+$category = convert($data);
 
-            $data = json_decode(json_encode($data), true);
-            $category = convert($data);
+?>
 
-
-/////////////вывод дерева по подготовленному массиву
+/////////////РІС‹РІРѕРґ РґРµСЂРµРІР° РїРѕ РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅРѕРјСѓ РјР°СЃСЃРёРІСѓ
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="/js/jquery.treeview.js"></script>
 <link rel="stylesheet" href="/css/jquery.treeview.css">
@@ -85,19 +80,19 @@ function convert($array, $i = 'telecom_id', $p = 'master_id')
         max-width: 450px;
         max-height: 500px;
         background: #fff;
-        /* цвет фона, белый */
+        /* С†РІРµС‚ С„РѕРЅР°, Р±РµР»С‹Р№ */
         border: 1px solid #C1C1C1;
-        /* размер и цвет границы блока */
+        /* СЂР°Р·РјРµСЂ Рё С†РІРµС‚ РіСЂР°РЅРёС†С‹ Р±Р»РѕРєР° */
 
         overflow-y: scroll;
-        /* прокрутка по вертикали */
+        /* РїСЂРѕРєСЂСѓС‚РєР° РїРѕ РІРµСЂС‚РёРєР°Р»Рё */
     }
 </style>
 </style>
 <div class="row inline-flex prokrutka">
-    <label class="col-sm-1" style="width: 100px;">Телеком:</label>
+    <label class="col-sm-1" style="width: 100px;">РўРµР»РµРєРѕРј:</label>
     <?php
-    $telecoms = TelecomTree::getTelecom();
+
     function out_tree_radio($array, $first = true)
     {
         if ($first) {
@@ -122,12 +117,12 @@ function convert($array, $i = 'telecom_id', $p = 'master_id')
         return $out;
     }
 
-
-        echo out_tree_radio($telecoms);
+    $telecoms; ////////////РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°
+    echo out_tree_radio($telecoms);
 
 
     ?>
 
 
 
-///////ссылка на библиатеку https://github.com/jzaefferer/jquery-treeview
+    ///////СЃСЃС‹Р»РєР° РЅР° Р±РёР±Р»РёР°С‚РµРєСѓ https://github.com/jzaefferer/jquery-treeview
